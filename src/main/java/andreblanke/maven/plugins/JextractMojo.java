@@ -1,5 +1,7 @@
 package andreblanke.maven.plugins;
 
+import java.util.spi.ToolProvider;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -17,5 +19,15 @@ public final class JextractMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoFailureException {
+        getJextractToolProvider();
+    }
+
+    private ToolProvider jextractToolProvider;
+    private ToolProvider getJextractToolProvider() throws MojoFailureException {
+        if (jextractToolProvider == null) {
+            jextractToolProvider =
+                ToolProvider.findFirst("jextract").orElseThrow(() -> new MojoFailureException(""));
+        }
+        return jextractToolProvider;
     }
 }

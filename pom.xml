@@ -13,6 +13,8 @@
   <packaging>maven-plugin</packaging>
   <version>1.0-SNAPSHOT</version>
 
+  <url>https://github.com/andreblanke/jextract-maven-plugin</url>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -50,6 +52,25 @@
           <source>14</source>
           <target>14</target>
         </configuration>
+      </plugin>
+
+      <!--
+        Using version 3.3 and higher fixes issues when lambda expressions are used inside the Mojo:
+        https://stackoverflow.com/questions/26737447/maven-plugin-build-fails-when-lambdas-are-used.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>3.6.0</version>
+        <!-- Force maven-plugin-plugin to use a newer version of ASM compatible with Java 14. -->
+        <dependencies>
+          <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
+          <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>7.2</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
