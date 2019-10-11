@@ -1,16 +1,11 @@
 package andreblanke.maven.plugins;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.spi.ToolProvider;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -38,9 +33,8 @@ public final class JextractMojo extends AbstractMojo {
      *
      * -?, -h, --help
      * --dry-run
-     * --package-map <String>
      */
-    //<editor-fold desc="JextractCliOptions">
+    // <editor-fold desc="JextractCliOptions">
     @Parameter
     @JextractCliOption("-C")
     private List<String> clangArgs;
@@ -89,8 +83,8 @@ public final class JextractMojo extends AbstractMojo {
 
     @Parameter
     @JextractCliOption(
-        value  = "--no-locations",
-        isFlag = true)
+        value     = "--no-locations",
+        isFlag    = true)
     private boolean noLocations;
 
     @Parameter(
@@ -100,9 +94,13 @@ public final class JextractMojo extends AbstractMojo {
     private File outputFile;
 
     @Parameter
+    @JextractCliOption("--package-map")
+    private Properties packageMapping;
+
+    @Parameter
     @JextractCliOption(
-        value  = "--record-library-path",
-        isFlag = true)
+        value     = "--record-library-path",
+        isFlag    = true)
     private boolean recordLibraryPath;
 
     /*
@@ -126,7 +124,7 @@ public final class JextractMojo extends AbstractMojo {
         required     = true)
     @JextractCliOption("-t")
     private String targetPackage;
-    //</editor-fold>
+    // </editor-fold>
 
     @Parameter
     private List<File> headerFiles;
@@ -142,7 +140,7 @@ public final class JextractMojo extends AbstractMojo {
         project.getArtifact().setFile(outputFile);
     }
 
-    //<editor-fold desc="getJextractArgs()">
+    // <editor-fold desc="getJextractArgs()">
     @Contract("_ -> fail")
     @SuppressWarnings("unchecked")
     private static <T, E extends Exception> T throwUnchecked(Exception exception) throws E {
@@ -154,29 +152,49 @@ public final class JextractMojo extends AbstractMojo {
             .stream(JextractMojo.class.getDeclaredFields())
             .filter(field -> field.getAnnotation(JextractCliOption.class) != null)
             .flatMap(field -> {
+                final Object fieldValue;
+
                 final var annotation     = field.getAnnotation(JextractCliOption.class);
                 final Class<?> fieldType = field.getType();
 
-                if (annotation.isFlag()) {
-                    if (boolean.class.isAssignableFrom(fieldType) || Boolean.class.isAssignableFrom(fieldType))
-                        return Stream.of(annotation.value());
-                    return throwUnchecked(new MojoExecutionException(this, "", ""));
-                }
-
                 try {
-                    if (Collection.class.isAssignableFrom(fieldType)) {
-                        var iterable = (Iterable<?>) field.get(this);
-
-                        return
-                            StreamSupport
-                                .stream(iterable.spliterator(), false)
-                                .flatMap(element -> Stream.of(annotation.value(), Objects.toString(element)));
-                    }
-                    return Stream.of(annotation.value(), Objects.toString(field.get(this)));
+                    fieldValue = field.get(this);
                 } catch (final IllegalAccessException exception) {
-                    /* Should not happen, as we are only accessing fields declared inside this class. */
+                    /*
+                     * Should not happen, as we are only accessing fields declared inside this class but rethrow
+                     * sneakily just in case.
+                     */
                     return throwUnchecked(exception);
                 }
+
+                if (fieldValue == null)
+                    return Stream.of();
+
+                if (annotation.isFlag()) {
+                    /* Fields of non-boolean types cannot be flag options. */
+                    if (!boolean.class.isAssignableFrom(fieldType) && !Boolean.class.isAssignableFrom(fieldType))
+                        return throwUnchecked(
+                            new MojoFailureException(
+                                String.format("Field '%s' is marked as flag but not of type boolean.", field.getName())));
+                    return ((boolean) fieldValue) ? Stream.of(annotation.value()) : Stream.of();
+                }
+
+                if (Collection.class.isAssignableFrom(fieldType)) {
+                    return
+                        ((Collection<?>) fieldValue)
+                            .stream()
+                            .flatMap(element -> Stream.of(annotation.value(), Objects.toString(element)));
+                }
+                if (Properties.class.isAssignableFrom(fieldType)) {
+                    return
+                        ((Properties) fieldValue)
+                            .entrySet()
+                            .stream()
+                            .flatMap(entry ->Stream.of(
+                                annotation.value(),
+                                String.format("%1$s=%2$s", entry.getKey(), entry.getValue())));
+                }
+                return Stream.of(annotation.value(), fieldValue.toString());
             })
             .collect(toList());
     }
@@ -194,7 +212,7 @@ public final class JextractMojo extends AbstractMojo {
 
         return cliOptionArgs.toArray(new String[0]);
     }
-    //</editor-fold>
+    // </editor-fold>
 
     @NotNull
     private ToolProvider getJextractToolProvider() throws MojoFailureException {

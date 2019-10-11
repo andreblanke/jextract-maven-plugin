@@ -7,8 +7,10 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@interface JextractCliOption {
+public @interface JextractCliOption {
+
     String value();
 
-    boolean isFlag() default false;
+    boolean isFlag()
+        default false;
 }

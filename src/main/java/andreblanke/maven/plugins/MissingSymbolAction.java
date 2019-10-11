@@ -2,6 +2,8 @@ package andreblanke.maven.plugins;
 
 import java.util.Locale;
 
+import org.jetbrains.annotations.NotNull;
+
 enum MissingSymbolAction {
 
     ERROR,
@@ -9,6 +11,7 @@ enum MissingSymbolAction {
     IGNORE,
     WARN;
 
+    @NotNull
     @Override
     public String toString() {
         return name().toLowerCase(Locale.ROOT);
