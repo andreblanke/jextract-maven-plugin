@@ -19,65 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <!-- Test dependencies must be declared first to prevent https://issues.apache.org/jira/browse/MPLUGINTESTING-52. -->
   <dependencies>
-    <!-- <editor-fold desc="Test dependencies"> -->
-
-    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.5.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- <editor-fold desc="Maven Plugin Testing Harness"> -->
-
-    <!-- https://mvnrepository.com/artifact/org.apache.maven.plugin-testing/maven-plugin-testing-harness -->
-    <dependency>
-      <groupId>org.apache.maven.plugin-testing</groupId>
-      <artifactId>maven-plugin-testing-harness</artifactId>
-      <version>3.3.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-core -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core</artifactId>
-      <version>3.2.5</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-compat -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-compat</artifactId>
-      <version>3.2.5</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-aether-provider -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-aether-provider</artifactId>
-      <version>3.2.5</version>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-utils -->
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-      <version>3.0.15</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- </editor-fold> -->
-
-    <!-- </editor-fold> -->
-
-    <!-- <editor-fold desc="Compile dependencies"> -->
-
     <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-model -->
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -112,7 +54,6 @@
       <artifactId>annotations</artifactId>
       <version>17.0.0</version>
     </dependency>
-    <!-- </editor-fold> -->
   </dependencies>
 
   <build>
