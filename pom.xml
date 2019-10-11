@@ -57,14 +57,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-model -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-      <version>3.2.5</version>
-      <scope>test</scope>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-aether-provider -->
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -85,6 +77,13 @@
     <!-- </editor-fold> -->
 
     <!-- <editor-fold desc="Compile dependencies"> -->
+
+    <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-model -->
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>3.6.2</version>
+    </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.apache.maven.plugin-tools/maven-plugin-annotations -->
     <dependency>

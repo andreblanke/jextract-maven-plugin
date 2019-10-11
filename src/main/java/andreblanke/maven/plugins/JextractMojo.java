@@ -12,6 +12,7 @@ import java.util.stream.StreamSupport;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -21,7 +22,9 @@ import org.jetbrains.annotations.NotNull;
 
 import static java.util.stream.Collectors.toList;
 
-@Mojo(name = "jextract")
+@Mojo(
+    name         = "jextract",
+    defaultPhase = LifecyclePhase.PACKAGE)
 public final class JextractMojo extends AbstractMojo {
 
     @Parameter(
@@ -34,12 +37,9 @@ public final class JextractMojo extends AbstractMojo {
      * jextract CLI options which are not (yet) supported by this plugin:
      *
      * -?, -h, --help
-     * -d <String>
      * --dry-run
      * --package-map <String>
-     * --src-dump-dir <String>
      */
-
     //<editor-fold desc="JextractCliOptions">
     @Parameter
     @JextractCliOption("-C")
@@ -52,6 +52,12 @@ public final class JextractMojo extends AbstractMojo {
     @Parameter
     @JextractCliOption("-L")
     private List<File> libraryPaths;
+
+    @Parameter(
+        defaultValue = "${project.build.outputDirectory}",
+        required     = true)
+    @JextractCliOption("-d")
+    private File generatedClassFilesDirectory;
 
     @Parameter
     @JextractCliOption("--exclude-headers")
@@ -82,15 +88,21 @@ public final class JextractMojo extends AbstractMojo {
     private MissingSymbolAction missingSymbolAction;
 
     @Parameter
-    @JextractCliOption(value = "--no-locations", isFlag = true)
+    @JextractCliOption(
+        value  = "--no-locations",
+        isFlag = true)
     private boolean noLocations;
 
-    @Parameter
+    @Parameter(
+        defaultValue = "${project.build.directory}/${project.artifactId}-${project.version}.jar",
+        required     = true)
     @JextractCliOption("-o")
-    private String output;
+    private File outputFile;
 
     @Parameter
-    @JextractCliOption(value = "--record-library-path", isFlag = true)
+    @JextractCliOption(
+        value  = "--record-library-path",
+        isFlag = true)
     private boolean recordLibraryPath;
 
     /*
@@ -103,7 +115,15 @@ public final class JextractMojo extends AbstractMojo {
     @JextractCliOption("--static-forwarder")
     private boolean staticForwarder;
 
-    @Parameter
+    @Parameter(
+        defaultValue = "${project.build.outputDirectory}",
+        required     = true)
+    @JextractCliOption("--src-dump-dir")
+    private File sourceDumpDirectory;
+
+    @Parameter(
+        defaultValue = "${project.groupId}",
+        required     = true)
     @JextractCliOption("-t")
     private String targetPackage;
     //</editor-fold>
@@ -113,10 +133,13 @@ public final class JextractMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoFailureException {
-        if (targetPackage == null)
-            targetPackage = project.getGroupId();
+        String[] args = getJextractArgs();
 
-        getJextractToolProvider().run(System.out, System.err, getJextractArgs());
+        getLog().info(String.format("Running jextract with arguments: %s", Arrays.toString(args)));
+
+        getJextractToolProvider().run(System.out, System.err, args);
+
+        project.getArtifact().setFile(outputFile);
     }
 
     //<editor-fold desc="getJextractArgs()">
@@ -127,7 +150,8 @@ public final class JextractMojo extends AbstractMojo {
     }
 
     private List<String> getJextractCliOptionArgs() {
-        return Arrays.stream(JextractMojo.class.getDeclaredFields())
+        return Arrays
+            .stream(JextractMojo.class.getDeclaredFields())
             .filter(field -> field.getAnnotation(JextractCliOption.class) != null)
             .flatMap(field -> {
                 final var annotation     = field.getAnnotation(JextractCliOption.class);
@@ -172,19 +196,13 @@ public final class JextractMojo extends AbstractMojo {
     }
     //</editor-fold>
 
-    //<editor-fold desc="getJextractToolProvider()">
-    private ToolProvider jextractToolProvider;
+    @NotNull
     private ToolProvider getJextractToolProvider() throws MojoFailureException {
-        if (jextractToolProvider == null) {
-            jextractToolProvider =
-                ToolProvider
-                    .findFirst("jextract")
-                    .orElseThrow(() -> new MojoFailureException(
-                        this,
-                        "jextract not found",
-                        "The jextract executable could not be found. Perhaps your JDK is outdated or configured incorrectly?"));
-        }
-        return jextractToolProvider;
+        return ToolProvider
+            .findFirst("jextract")
+            .orElseThrow(() -> new MojoFailureException(
+                this,
+                "jextract not found",
+                "The jextract executable could not be found. Perhaps your JDK is outdated or configured incorrectly?"));
     }
-    //</editor-fold>
 }
