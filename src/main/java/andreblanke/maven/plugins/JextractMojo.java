@@ -1,11 +1,20 @@
 package andreblanke.maven.plugins;
 
 import java.io.File;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.spi.ToolProvider;
 import java.util.stream.Stream;
 
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -16,6 +25,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Mojo(
     name         = "jextract",
@@ -34,6 +44,7 @@ public final class JextractMojo extends AbstractMojo {
      * -?, -h, --help
      * --dry-run
      */
+
     // <editor-fold desc="JextractCliOptions">
     @Parameter
     @JextractCliOption("-C")
@@ -52,6 +63,12 @@ public final class JextractMojo extends AbstractMojo {
         required     = true)
     @JextractCliOption("-d")
     private File generatedClassFilesDirectory;
+
+    @Parameter
+    @JextractCliOption(
+        value  = "--dry-run",
+        isFlag = true)
+    private boolean dryRun;
 
     @Parameter
     @JextractCliOption("--exclude-headers")
@@ -109,19 +126,21 @@ public final class JextractMojo extends AbstractMojo {
      * The reason for this is an inconsistency in the jextract CLI, as --static-forwarder, which defaults to true,
      * is specified as "--static-forwarder <Boolean>" instead of e.g. "--no-static-forwarder".
      */
+    /*
+     * This parameter is of type Boolean instead of boolean to omit it from the output of getJextractArgs() unless it
+     * is explicitly set.
+     */
     @Parameter
     @JextractCliOption("--static-forwarder")
-    private boolean staticForwarder;
+    private Boolean staticForwarder;
 
     @Parameter(
-        defaultValue = "${project.build.outputDirectory}",
+        defaultValue = "${project.build.directory}/generated-sources",
         required     = true)
     @JextractCliOption("--src-dump-dir")
     private File sourceDumpDirectory;
 
-    @Parameter(
-        defaultValue = "${project.groupId}",
-        required     = true)
+    @Parameter(defaultValue = "${project.groupId}")
     @JextractCliOption("-t")
     private String targetPackage;
     // </editor-fold>
@@ -130,14 +149,33 @@ public final class JextractMojo extends AbstractMojo {
     private List<File> headerFiles;
 
     @Override
-    public void execute() throws MojoFailureException {
-        String[] args = getJextractArgs();
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        final Set<String> logLevelNames = getDefaultJavaUtilLoggingLevelNames();
+
+        if (!logLevelNames.contains(logLevel))
+            throw new MojoFailureException(
+                this,
+                String.format("Unknown %1$s name: '%2$s'.", Level.class.getName(), logLevel),
+                String.format("Valid names include: %s", logLevelNames));
+        final String[] args = getJextractArgs();
 
         getLog().info(String.format("Running jextract with arguments: %s", Arrays.toString(args)));
 
         getJextractToolProvider().run(System.out, System.err, args);
 
-        project.getArtifact().setFile(outputFile);
+        if (!dryRun) {
+            if (!outputFile.exists())
+                throw new MojoExecutionException("");
+
+            project.getArtifact().setFile(outputFile);
+        }
+    }
+
+    private static Set<String> getDefaultJavaUtilLoggingLevelNames() {
+        return Arrays.stream(Level.class.getFields())
+            .filter(field -> Modifier.isStatic(field.getModifiers()) && Level.class.isAssignableFrom(field.getType()))
+            .map(Field::getName)
+            .collect(toSet());
     }
 
     // <editor-fold desc="getJextractArgs()">
@@ -148,8 +186,7 @@ public final class JextractMojo extends AbstractMojo {
     }
 
     private List<String> getJextractCliOptionArgs() {
-        return Arrays
-            .stream(JextractMojo.class.getDeclaredFields())
+        return Arrays.stream(JextractMojo.class.getDeclaredFields())
             .filter(field -> field.getAnnotation(JextractCliOption.class) != null)
             .flatMap(field -> {
                 final Object fieldValue;

@@ -4,6 +4,9 @@ import java.util.Locale;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Denotes a possible action taken by {@code jextract} when it encounters a missing native symbol.
+ */
 enum MissingSymbolAction {
 
     ERROR,
