@@ -161,7 +161,7 @@ public final class JextractMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         final Set<String> logLevelNames = getDefaultJavaUtilLoggingLevelNames();
 
-        if (!logLevelNames.contains(logLevel))
+        if (logLevel != null && !logLevelNames.contains(logLevel))
             throw new MojoFailureException(
                 this,
                 String.format("Unknown %1$s name: '%2$s'.", Level.class.getName(), logLevel),
