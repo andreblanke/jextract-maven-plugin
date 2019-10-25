@@ -170,9 +170,18 @@ public final class JextractMojo extends AbstractMojo {
 
         getLog().info(String.format("Running jextract with arguments: %s", Arrays.toString(args)));
 
-        getJextractToolProvider().run(System.out, System.err, args);
+        final int exitCode = getJextractToolProvider().run(System.out, System.err, args);
+
+        if (exitCode != 0)
+            getLog().warn(String.format("jextract terminated with non-zero exit code: %d", exitCode));
 
         if (!dryRun) {
+            if (headerFiles == null || headerFiles.isEmpty())
+                throw new MojoFailureException(
+                    this,
+                    "No input files provided.",
+                    "Input header files are required to produce an artifact using jextract.");
+
             if (!outputFile.exists())
                 throw new MojoExecutionException("");
 
