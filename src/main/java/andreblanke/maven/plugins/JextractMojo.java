@@ -249,13 +249,14 @@ public final class JextractMojo extends AbstractMojo {
     private String[] getJextractArgs() {
         final List<String> cliOptionArgs = getJextractCliOptionArgs();
 
-        cliOptionArgs.add("--");
-        cliOptionArgs.addAll(
-            headerFiles
-                .stream()
-                .map(File::toString)
-                .collect(toList()));
-
+        if (headerFiles != null && !headerFiles.isEmpty()) {
+            cliOptionArgs.add("--");
+            cliOptionArgs.addAll(
+                headerFiles
+                    .stream()
+                    .map(File::toString)
+                    .collect(toList()));
+        }
         return cliOptionArgs.toArray(new String[0]);
     }
     // </editor-fold>
