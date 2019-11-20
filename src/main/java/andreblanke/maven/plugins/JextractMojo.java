@@ -45,7 +45,8 @@ import static java.util.stream.Collectors.toSet;
 
 @Mojo(
     name         = "jextract",
-    defaultPhase = LifecyclePhase.PACKAGE)
+    defaultPhase = LifecyclePhase.PACKAGE,
+    threadSafe   = true)
 public final class JextractMojo extends AbstractMojo {
 
     @Parameter(
