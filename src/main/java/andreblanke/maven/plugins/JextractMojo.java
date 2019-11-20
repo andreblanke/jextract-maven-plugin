@@ -154,11 +154,17 @@ public final class JextractMojo extends AbstractMojo {
     private String targetPackage;
     // </editor-fold>
 
+    @Parameter(defaultValue = "false")
+    private boolean skip;
+
     @Parameter
-    private List<File> headerFiles;
+    private List<String> headerFiles;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skip)
+            return;
+
         final Set<String> logLevelNames = getDefaultJavaUtilLoggingLevelNames();
 
         if (logLevel != null && !logLevelNames.contains(logLevel))
@@ -260,11 +266,7 @@ public final class JextractMojo extends AbstractMojo {
 
         if (headerFiles != null && !headerFiles.isEmpty()) {
             cliOptionArgs.add("--");
-            cliOptionArgs.addAll(
-                headerFiles
-                    .stream()
-                    .map(File::toString)
-                    .collect(toList()));
+            cliOptionArgs.addAll(headerFiles);
         }
         return cliOptionArgs.toArray(new String[0]);
     }
