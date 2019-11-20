@@ -155,16 +155,23 @@ public final class JextractMojo extends AbstractMojo {
     private String targetPackage;
     // </editor-fold>
 
-    @Parameter(defaultValue = "false")
+    @Parameter
     private boolean skip;
 
     @Parameter
     private List<String> headerFiles;
 
+    private static final String JAR_PACKAGING = "jar";
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (skip)
             return;
+        if (!Objects.equals(project.getPackaging(), JAR_PACKAGING))
+            throw new MojoFailureException(
+                this,
+                "Unsupported packaging.",
+                "Only 'jar' packaging is supported by the jextract-maven-plugin.");
 
         final Set<String> logLevelNames = getDefaultJavaUtilLoggingLevelNames();
 
