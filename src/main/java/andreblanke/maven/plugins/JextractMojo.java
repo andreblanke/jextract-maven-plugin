@@ -165,8 +165,10 @@ public final class JextractMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (skip)
+        if (skip) {
+            getLog().info("Skipping jextract-maven-plugin execution.");
             return;
+        }
         if (!Objects.equals(project.getPackaging(), JAR_PACKAGING))
             throw new MojoFailureException(
                 this,
