@@ -20,6 +20,11 @@
         <version>1.0.0</version>
         <configuration>
           <header>/usr/include/unistd.h</header>
+          <!--
+            Needs to be set, as otherwise the package "dev.blanke.maven.plugins.jextract-maven-plugin-it-unistd" will
+            be attempted to be used, causing the class compilation within jextract to fail.
+          -->
+          <package>org.unix.unistd</package>
         </configuration>
         <executions>
           <execution>
