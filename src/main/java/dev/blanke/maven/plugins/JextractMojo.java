@@ -14,12 +14,16 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 
 /**
  * Mojo that generates Java classes from C headers files by delegating to {@code jextract}.
  */
 @Mojo(name = "jextract", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 public final class JextractMojo extends AbstractMojo {
+
+    @Parameter(defaultValue = "${project}")
+    private MavenProject project;
 
     @Parameter
     private List<String> clangArgs = new ArrayList<>();
@@ -28,8 +32,7 @@ public final class JextractMojo extends AbstractMojo {
     private List<String> includePaths = new ArrayList<>();
 
     @Parameter(
-        defaultValue = "${project.build.outputDirectory}",
-        readonly     = true,
+        defaultValue = "${project.build.directory}/generated-sources/jextract",
         required     = true)
     private File outputDirectory;
 
@@ -60,7 +63,9 @@ public final class JextractMojo extends AbstractMojo {
     @Parameter(alias = "libs")
     private List<String> libraries = new ArrayList<>();
 
-    @Parameter(defaultValue = "${project.groupId}.${project.artifactId}", alias = "package")
+    @Parameter(
+        defaultValue = "${project.groupId}.${project.artifactId}",
+        alias        = "package")
     private String targetPackage;
 
     @Parameter(required = true, alias = "header")
@@ -87,6 +92,7 @@ public final class JextractMojo extends AbstractMojo {
             getLog().error(
                 new MojoFailureException("jextract terminated with non-zero exit code: %d".formatted(exitCode)));
         }
+        project.addCompileSourceRoot(outputDirectory.getPath());
     }
 
     /**
@@ -192,6 +198,12 @@ public final class JextractMojo extends AbstractMojo {
             args.add("--target-package");
             args.add(targetPackage);
         }
+
+        /*
+         * Generate Java source code instead of compiled *.class files so that compilation settings of the
+         * maven-compiler-plugin are honored and errors are reported by it instead of jextract.
+         */
+        args.add("--source");
 
         args.add(headerFile.getPath());
 

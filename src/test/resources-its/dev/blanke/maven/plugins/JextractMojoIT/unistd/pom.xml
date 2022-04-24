@@ -4,9 +4,9 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>dev.blanke.maven.plugins</groupId>
-  <artifactId>jextract-maven-plugin-it-unistd</artifactId>
-  <version>1.0.0</version>
+  <groupId>org.unix</groupId>
+  <artifactId>unistd</artifactId>
+  <version>1.1.0</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,14 +17,9 @@
       <plugin>
         <groupId>dev.blanke.maven.plugins</groupId>
         <artifactId>jextract-maven-plugin</artifactId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <configuration>
           <header>/usr/include/unistd.h</header>
-          <!--
-            Needs to be set, as otherwise the package "dev.blanke.maven.plugins.jextract-maven-plugin-it-unistd" will
-            be attempted to be used, causing the class compilation within jextract to fail.
-          -->
-          <package>org.unix.unistd</package>
         </configuration>
         <executions>
           <execution>
@@ -34,6 +29,19 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>19</source>
+          <target>19</target>
+          <compilerArgs>
+            <arg>--add-modules</arg>
+            <arg>jdk.incubator.jextract</arg>
+          </compilerArgs>
+        </configuration>
       </plugin>
     </plugins>
   </build>
