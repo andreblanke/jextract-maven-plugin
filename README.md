@@ -99,7 +99,7 @@ must be instructed to allow access to the module:
 ```xml
 <configuration>
   <!--
-    Path to the C header file for which native bindings should be generated.
+    Path to the C header file for which Java bindings should be generated.
     The alias "header" may be used.
   -->
   <headerFile>...</headerFile>
