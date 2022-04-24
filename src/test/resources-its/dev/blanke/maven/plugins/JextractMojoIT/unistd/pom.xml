@@ -6,7 +6,7 @@
 
   <groupId>dev.blanke.maven.plugins</groupId>
   <artifactId>jextract-maven-plugin-it-unistd</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,7 +17,7 @@
       <plugin>
         <groupId>dev.blanke.maven.plugins</groupId>
         <artifactId>jextract-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
         <configuration>
           <header>/usr/include/unistd.h</header>
         </configuration>

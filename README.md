@@ -40,7 +40,7 @@ defining an execution of the `jextract` goal:
 <plugin>
   <groupId>dev.blanke.maven.plugins</groupId>
   <artifactId>jextract-maven-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <configuration>
     <!-- "header" is the only required configuration element. -->
     <header>...</header>
