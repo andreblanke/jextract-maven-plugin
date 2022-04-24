@@ -192,6 +192,12 @@ must be instructed to allow access to the module:
 
 See the [integration tests](src/test/resources-its/dev/blanke/maven/plugins/JextractMojoIT) of the plugin for examples.
 
+## Related projects
+
+- [openjdk/jextract](https://github.com/openjdk/jextract)
+- [openjdk/panama-foreign](https://github.com/openjdk/panama-foreign)
+- [krakowski/gradle-jextract](https://github.com/krakowski/gradle-jextract)
+
 ## License
 
 This project is licensed under the Apache-2.0 license. See the [LICENSE](LICENSE) file for more information.
