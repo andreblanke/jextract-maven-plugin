@@ -1,7 +1,7 @@
 # jextract-maven-plugin
 
 [![License][1]](https://www.apache.org/licenses/LICENSE-2.0)
-[![Maven Central][2]](https://search.maven.org/artifact/dev.blanke.maven.plugins/jextract-maven-plugin/1.1.0/maven-plugin)
+[![Maven Central][2]](https://search.maven.org/artifact/dev.blanke.maven.plugins/jextract-maven-plugin/1.1.1/maven-plugin)
 
 A Maven plugin to enable the execution of Project Panama's [`jextract`](https://github.com/openjdk/jextract) tool as
 part of a build, allowing the generation of Java bindings from native library headers.
