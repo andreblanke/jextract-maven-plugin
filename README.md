@@ -1,5 +1,8 @@
 # jextract-maven-plugin
 
+[![License][1]](https://www.apache.org/licenses/LICENSE-2.0)
+[![Maven Central][2]](https://search.maven.org/artifact/dev.blanke.maven.plugins/jextract-maven-plugin/1.1.0/maven-plugin)
+
 A Maven plugin to enable the execution of Project Panama's [`jextract`](https://github.com/openjdk/jextract) tool as
 part of a build, allowing the generation of Java bindings from native library headers.
 
@@ -7,7 +10,7 @@ part of a build, allowing the generation of Java bindings from native library he
 
 - [Project Panama Early Access-Access Builds](https://jdk.java.net/panama/)
   - While the plugin can be built using JDK 17 and newer, the early access build must be used to invoke Maven so that
-    the plugin can find the `jextract` [ToolProvider][1]. Make sure to set the `JAVA_HOME` environment variable
+    the plugin can find the `jextract` [ToolProvider][3]. Make sure to set the `JAVA_HOME` environment variable
     accordingly and follow the steps in the [Allowing access to `jextract`](#allowing-access-to-jextract) section.
 - [LLVM >= 9](https://releases.llvm.org/download.html)
 
@@ -202,4 +205,7 @@ See the [integration tests](src/test/resources-its/dev/blanke/maven/plugins/Jext
 
 This project is licensed under the Apache-2.0 license. See the [LICENSE](LICENSE) file for more information.
 
-[1]: https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/spi/ToolProvider.html
+[1]: https://img.shields.io/github/license/apache/maven.svg?label=License
+[2]: https://img.shields.io/maven-metadata/v.svg?label=Maven%20Central&metadataUrl=https://repo1.maven.org/maven2/dev/blanke/maven/plugins/jextract-maven-plugin/maven-metadata.xml
+
+[3]: https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/spi/ToolProvider.html
