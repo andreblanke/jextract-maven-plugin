@@ -143,7 +143,7 @@ public final class JextractMojo extends AbstractMojo {
     private File headerFile;
 
     @Override
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         final var args = getJextractArgs();
         getLog().info("Running jextract with arguments: %s".formatted(Arrays.toString(args)));
 
@@ -160,8 +160,7 @@ public final class JextractMojo extends AbstractMojo {
         }
 
         if (exitCode != 0) {
-            getLog().error(
-                new MojoFailureException("jextract terminated with non-zero exit code: %d".formatted(exitCode)));
+            throw new MojoFailureException("jextract terminated with non-zero exit code: %d".formatted(exitCode));
         }
         project.addCompileSourceRoot(outputDirectory.getPath());
     }

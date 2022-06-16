@@ -13,6 +13,11 @@ import static com.soebes.itf.extension.assertj.MavenExecutionResultAssert.assert
 final class JextractMojoIT {
 
     @MavenTest
+    void missing(final MavenExecutionResult result) {
+        assertThat(result).isFailure();
+    }
+
+    @MavenTest
     void point(final MavenExecutionResult result) {
         assertThat(result).isSuccessful()
             .project()
